@@ -16,8 +16,14 @@ public class Main {
        serverSocket = new ServerSocket(4221);
        serverSocket.setReuseAddress(true);
        clientSocket = serverSocket.accept(); // Wait for connection from client.
-       System.out.println("accepted new connection");
-       clientSocket.getOutputStream().write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+       HttpParser parser = new HttpParser(clientSocket.getInputStream());
+       parser.parseHttpRequest();
+
+       if(parser.getEndpoint().equals("/"))
+         clientSocket.getOutputStream().write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+       else
+          clientSocket.getOutputStream().write("HTTP/1.1 404 Not Found\r\n\r\n".getBytes());
+
        clientSocket.getOutputStream().flush();
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
