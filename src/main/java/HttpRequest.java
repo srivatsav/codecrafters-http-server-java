@@ -2,26 +2,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Map;
 
-public class HttpParser {
+public class HttpRequest {
     private static BufferedReader bufferedReader;
     private String httpMethod;
     private String endpoint;
     private String host;
     private Map  headers;
 
-    public HttpParser(InputStream socketInputStream) {
+    public HttpRequest(InputStream socketInputStream) {
         this.bufferedReader = new BufferedReader(new InputStreamReader(socketInputStream));
     }
-    public void parseHttpRequest() throws IOException {
-
+    public HttpRequest parse() throws IOException {
       // read line by line from the bufferedReader
       String line = bufferedReader.readLine();
       String [] lineSplit = line.split("\\s+");
       this.httpMethod = lineSplit[0];
       this.endpoint = lineSplit[1];
+      return this;
     }
 
     public String getHttpMethod() {
