@@ -43,7 +43,7 @@ public class ResponseHandler {
     ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
     responseHeaderLines.add(responseHeaderLine);
     String echoString = parsedRequest.getRequestLine().getRequestTarget().substring(6);
-    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length());
+    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length() + 2);
     responseHeaderLines.add(responseHeaderLine);
 
     ResponseBodyLine responseBodyLine = response.getResponseBodyLine(echoString);
@@ -71,7 +71,7 @@ public class ResponseHandler {
         .findFirst()
         .map(responseHeaderLine1 -> responseHeaderLine1.getHeaderValue())
         .orElse("Unknown");
-    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), userAgent.length());
+    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), userAgent.length() + 2);
     responseHeaderLines.add(responseHeaderLine);
 
     ResponseBodyLine responseBodyLine = response.getResponseBodyLine(userAgent);

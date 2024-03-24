@@ -34,6 +34,7 @@ public class HttpResponse {
     for (ResponseHeaderLine responseHeaderLine : responseHeaderLines) {
       response.append(responseHeaderLine.getResponseLine());
     }
+    // marks the end of headers
     response.append(CR_LF);
     response.append(body.getResponseLine());
     return response.toString();
