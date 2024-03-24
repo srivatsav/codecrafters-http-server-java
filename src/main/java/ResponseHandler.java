@@ -1,3 +1,4 @@
+import static enums.ServerConstants.CR_LF;
 import static enums.ServerConstants.HTTP_VERSION_1_1;
 
 import enums.ContentType;
@@ -21,7 +22,7 @@ public class ResponseHandler {
     var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
-    osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+    osStream.write(statusLine.getResponseLine().concat(CR_LF).getBytes(StandardCharsets.UTF_8));
     osStream.flush();
   }
 
@@ -29,7 +30,7 @@ public class ResponseHandler {
     var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.NOT_FOUND);
-    osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+    osStream.write(statusLine.getResponseLine().concat(CR_LF).getBytes(StandardCharsets.UTF_8));
     osStream.flush();
   }
   public static void handleEcho(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
@@ -43,7 +44,7 @@ public class ResponseHandler {
     ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
     responseHeaderLines.add(responseHeaderLine);
     String echoString = parsedRequest.getRequestLine().getRequestTarget().substring(6);
-    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length());
+    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length() + 2);
     responseHeaderLines.add(responseHeaderLine);
 
     ResponseBodyLine responseBodyLine = response.getResponseBodyLine(echoString);

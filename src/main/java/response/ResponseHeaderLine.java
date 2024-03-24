@@ -26,7 +26,7 @@ public class ResponseHeaderLine<T> implements HttpResponseLine {
     StringBuilder stringBuilder = new StringBuilder();
     String statusLine = stringBuilder.append(this.headerName)
         .append(COLON).append(SPACE).append(this.headerValue)
-        .append(CR_LF).append(CR_LF).toString();
+        .append(CR_LF).toString();
     return statusLine;
   }
 
