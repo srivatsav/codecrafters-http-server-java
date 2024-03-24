@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import request.HttpRequest;
 
 public class Main {
@@ -17,22 +20,31 @@ public class Main {
        serverSocket = new ServerSocket(4221);
        serverSocket.setReuseAddress(true);
 
+       ExecutorService executorService = Executors.newFixedThreadPool(11);
+
        while(true) {
          clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-         HttpRequest parsedRequest = handleRequest(clientSocket);
-         ResponseHandler responseHandler = new ResponseHandler();
+         Socket finalClientSocket = clientSocket;
+         executorService.submit(() -> {
+           try {
+             HttpRequest parsedRequest = handleRequest(finalClientSocket);
+             ResponseHandler responseHandler = new ResponseHandler();
 
-         if(parsedRequest.getRequestLine().getRequestTarget().equals("/"))
-           responseHandler.handleOK(clientSocket);
-         else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/echo"))
-           responseHandler.handleEcho(clientSocket, parsedRequest);
-         else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
-           responseHandler.handleUserAgent(clientSocket, parsedRequest);
-         else
-           responseHandler.handle404(clientSocket);
+             if(parsedRequest.getRequestLine().getRequestTarget().equals("/"))
+               responseHandler.handleOK(finalClientSocket);
+             else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/echo"))
+               responseHandler.handleEcho(finalClientSocket, parsedRequest);
+             else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
+               responseHandler.handleUserAgent(finalClientSocket, parsedRequest);
+             else
+               responseHandler.handle404(finalClientSocket);
 
-         clientSocket.close();
+             finalClientSocket.close();
+           } catch (IOException e) {
+             System.out.println("IOException: " + e.getMessage());
+           }
+         });
        }
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
