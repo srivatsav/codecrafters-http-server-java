@@ -25,22 +25,22 @@ public class Main {
        while(true) {
          clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-         Socket finalClientSocket = clientSocket;
+         Socket finalSocket = clientSocket;
          executorService.submit(() -> {
            try {
-             HttpRequest parsedRequest = handleRequest(finalClientSocket);
+             HttpRequest parsedRequest = handleRequest(finalSocket);
              ResponseHandler responseHandler = new ResponseHandler();
 
              if(parsedRequest.getRequestLine().getRequestTarget().equals("/"))
-               responseHandler.handleOK(finalClientSocket);
+               responseHandler.handleOK(finalSocket);
              else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/echo"))
-               responseHandler.handleEcho(finalClientSocket, parsedRequest);
+               responseHandler.handleEcho(finalSocket, parsedRequest);
              else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
-               responseHandler.handleUserAgent(finalClientSocket, parsedRequest);
+               responseHandler.handleUserAgent(finalSocket, parsedRequest);
              else
-               responseHandler.handle404(finalClientSocket);
+               responseHandler.handle404(finalSocket);
 
-             finalClientSocket.close();
+             finalSocket.close();
            } catch (IOException e) {
              System.out.println("IOException: " + e.getMessage());
            }
