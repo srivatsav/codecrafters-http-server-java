@@ -13,8 +13,7 @@ public class ResponseBodyLine<T> implements HttpResponseLine{
   @Override
   public String getResponseLine() {
     StringBuilder stringBuilder = new StringBuilder();
-    String bodyLine = stringBuilder.append(this.body)
-        .append(CR_LF).toString();
+    String bodyLine = stringBuilder.append(this.body).toString();
     return bodyLine;
   }
 
