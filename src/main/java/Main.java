@@ -27,7 +27,6 @@ public class Main {
        else
          responseHandler.handle404(clientSocket);
 
-       clientSocket.getOutputStream().flush();
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
      }
