@@ -22,7 +22,6 @@ public class ResponseHandler {
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
     osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
     osStream.flush();
-    osStream.close();
   }
 
   public void handle404(Socket clientSocket) throws IOException {
@@ -31,7 +30,6 @@ public class ResponseHandler {
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.NOT_FOUND);
     osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
     osStream.flush();
-    osStream.close();
   }
   public static void handleEcho(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
     var osStream = clientSocket.getOutputStream();
@@ -53,9 +51,7 @@ public class ResponseHandler {
     response.setHeaderLines(headerLines);
     response.setBody(responseBodyLine);
 
-    clientSocket.getOutputStream().write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
-
+    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
     osStream.flush();
-    osStream.close();
   }
 }
