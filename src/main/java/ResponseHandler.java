@@ -35,7 +35,28 @@ public class ResponseHandler {
   }
   public static void handleEcho(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
     var osStream = clientSocket.getOutputStream();
+    String echoString = parsedRequest.getRequestLine().getRequestTarget().substring(6);
+    HttpResponse response = buildStatusHeadersAndPayload(echoString);
+    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
+    osStream.flush();
+  }
 
+  public static void handleUserAgent(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
+    var osStream = clientSocket.getOutputStream();
+
+    String userAgent = (String) parsedRequest.getHeaderLines().stream()
+        .filter(responseHeaderLine1 -> responseHeaderLine1.getHeaderName().equals(HttpHeaders.USER_AGENT.getHeader()))
+        .findFirst()
+        .map(responseHeaderLine1 -> responseHeaderLine1.getHeaderValue())
+        .orElse("Unknown");
+
+    HttpResponse response = buildStatusHeadersAndPayload(userAgent);
+
+    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
+    osStream.flush();
+  }
+
+  private static HttpResponse buildStatusHeadersAndPayload(String echoString) {
     HttpResponse response = new HttpResponse();
 
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
@@ -43,7 +64,7 @@ public class ResponseHandler {
     List<ResponseHeaderLine> responseHeaderLines = new ArrayList<>();
     ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
     responseHeaderLines.add(responseHeaderLine);
-    String echoString = parsedRequest.getRequestLine().getRequestTarget().substring(6);
+
     responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length());
     responseHeaderLines.add(responseHeaderLine);
 
@@ -52,36 +73,6 @@ public class ResponseHandler {
     response.setStatusLine(statusLine);
     response.setHeaderLines(responseHeaderLines);
     response.setBody(responseBodyLine);
-
-    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
-    osStream.flush();
-  }
-
-  public static void handleUserAgent(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
-    var osStream = clientSocket.getOutputStream();
-
-    HttpResponse response = new HttpResponse();
-    StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
-
-    List<ResponseHeaderLine> responseHeaderLines = new ArrayList<>();
-    ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
-    responseHeaderLines.add(responseHeaderLine);
-
-    String userAgent = (String) parsedRequest.getHeaderLines().stream()
-        .filter(responseHeaderLine1 -> responseHeaderLine1.getHeaderName().equals(HttpHeaders.USER_AGENT.getHeader()))
-        .findFirst()
-        .map(responseHeaderLine1 -> responseHeaderLine1.getHeaderValue())
-        .orElse("Unknown");
-    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), userAgent.length());
-    responseHeaderLines.add(responseHeaderLine);
-
-    ResponseBodyLine responseBodyLine = response.getResponseBodyLine(userAgent);
-
-    response.setStatusLine(statusLine);
-    response.setHeaderLines(responseHeaderLines);
-    response.setBody(responseBodyLine);
-
-    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
-    osStream.flush();
+    return response;
   }
 }
