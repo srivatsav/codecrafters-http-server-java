@@ -18,21 +18,14 @@ public class Main {
        clientSocket = serverSocket.accept(); // Wait for connection from client.
 
        HttpRequest parsedRequest = handleRequest(clientSocket);
+       ResponseHandler responseHandler = new ResponseHandler();
 
        if(parsedRequest.getEndpoint().equals("/"))
-         clientSocket.getOutputStream().write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
-       else if(parsedRequest.getEndpoint().startsWith("/echo")) {
-         String endpoint = parsedRequest.getEndpoint();
-         String echoString = endpoint.substring(6);
-         String contentTypeString = "Content-Type: text/plain\r\n";
-         String contentLengthString =
-             "Content-Length: " + echoString.length() + "\r\n";
-         String httpResponse = "HTTP/1.1 200 OK\r\n" + contentTypeString +
-             contentLengthString + "\r\n" + echoString + "\r\n";
-         clientSocket.getOutputStream().write(httpResponse.getBytes());
-       }
+         responseHandler.handleOK(clientSocket);
+       else if(parsedRequest.getEndpoint().startsWith("/echo"))
+         responseHandler.handleEcho(clientSocket, parsedRequest);
        else
-          clientSocket.getOutputStream().write("HTTP/1.1 404 Not Found\r\n\r\n".getBytes());
+         responseHandler.handle404(clientSocket);
 
        clientSocket.getOutputStream().flush();
      } catch (IOException e) {
