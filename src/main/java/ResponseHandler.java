@@ -20,8 +20,11 @@ public class ResponseHandler {
   public void handleOK(Socket clientSocket) throws IOException {
     var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
+    System.out.println("stepper-1");
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
+    System.out.println("stepper-2");
     osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+    System.out.println("stepper-3");
     osStream.flush();
   }
 

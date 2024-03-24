@@ -21,7 +21,6 @@ public class HttpRequest {
       try {
         //first line is requestLine
         String requestLine = bufferedReader.readLine();
-        System.out.println("Parsing request line " + requestLine);
         String [] requestLineSplit = requestLine.split("\\s+");
         this.requestLine = new RequestLine.RequestLineBuilder()
             .httpMethod(requestLineSplit[0])
