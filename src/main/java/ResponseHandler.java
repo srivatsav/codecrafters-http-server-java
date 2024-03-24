@@ -17,23 +17,18 @@ import response.StatusLine;
 public class ResponseHandler {
 
   public void handleOK(Socket clientSocket) throws IOException {
-    var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
-    osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
-    osStream.flush();
+    clientSocket.getOutputStream().write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
   }
 
   public void handle404(Socket clientSocket) throws IOException {
-    var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.NOT_FOUND);
-    osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
-    osStream.flush();
+    clientSocket.getOutputStream().write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+//    osStream.flush();
   }
   public static void handleEcho(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
-    var osStream = clientSocket.getOutputStream();
-
     HttpResponse response = new HttpResponse();
 
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
@@ -51,7 +46,7 @@ public class ResponseHandler {
     response.setHeaderLines(headerLines);
     response.setBody(responseBodyLine);
 
-    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
-    osStream.flush();
+    clientSocket.getOutputStream().write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
+
   }
 }
