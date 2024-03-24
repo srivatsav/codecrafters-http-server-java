@@ -16,20 +16,24 @@ public class Main {
      try {
        serverSocket = new ServerSocket(4221);
        serverSocket.setReuseAddress(true);
-       clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-       HttpRequest parsedRequest = handleRequest(clientSocket);
-       ResponseHandler responseHandler = new ResponseHandler();
+       while(true) {
+         clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-       if(parsedRequest.getRequestLine().getRequestTarget().equals("/"))
-         responseHandler.handleOK(clientSocket);
-       else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/echo"))
-         responseHandler.handleEcho(clientSocket, parsedRequest);
-       else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
-         responseHandler.handleUserAgent(clientSocket, parsedRequest);
-       else
-         responseHandler.handle404(clientSocket);
+         HttpRequest parsedRequest = handleRequest(clientSocket);
+         ResponseHandler responseHandler = new ResponseHandler();
 
+         if(parsedRequest.getRequestLine().getRequestTarget().equals("/"))
+           responseHandler.handleOK(clientSocket);
+         else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/echo"))
+           responseHandler.handleEcho(clientSocket, parsedRequest);
+         else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
+           responseHandler.handleUserAgent(clientSocket, parsedRequest);
+         else
+           responseHandler.handle404(clientSocket);
+
+         clientSocket.close();
+       }
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
      }
