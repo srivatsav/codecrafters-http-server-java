@@ -1,4 +1,3 @@
-import static enums.ServerConstants.CONTENT_TYPE;
 import static enums.ServerConstants.HTTP_VERSION_1_1;
 
 import enums.ContentType;
@@ -10,43 +9,78 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import response.HeaderLine;
+import response.ResponseHeaderLine;
+import request.HttpRequest;
+import response.HttpResponse;
 import response.ResponseBodyLine;
 import response.StatusLine;
 
 public class ResponseHandler {
 
   public void handleOK(Socket clientSocket) throws IOException {
+    var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
-    clientSocket.getOutputStream().write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+    osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+    osStream.flush();
   }
 
   public void handle404(Socket clientSocket) throws IOException {
+    var osStream = clientSocket.getOutputStream();
     HttpResponse response = new HttpResponse();
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.NOT_FOUND);
-    clientSocket.getOutputStream().write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
-//    osStream.flush();
+    osStream.write(statusLine.getResponseLine().getBytes(StandardCharsets.UTF_8));
+    osStream.flush();
   }
   public static void handleEcho(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
+    var osStream = clientSocket.getOutputStream();
+
     HttpResponse response = new HttpResponse();
 
     StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
 
-    List<HeaderLine> headerLines = new ArrayList<>();
-    HeaderLine headerLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
-    headerLines.add(headerLine);
-    String echoString = parsedRequest.getEndpoint().substring(6);
-    headerLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length());
-    headerLines.add(headerLine);
+    List<ResponseHeaderLine> responseHeaderLines = new ArrayList<>();
+    ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
+    responseHeaderLines.add(responseHeaderLine);
+    String echoString = parsedRequest.getRequestLine().getRequestTarget().substring(6);
+    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), echoString.length());
+    responseHeaderLines.add(responseHeaderLine);
 
     ResponseBodyLine responseBodyLine = response.getResponseBodyLine(echoString);
 
     response.setStatusLine(statusLine);
-    response.setHeaderLines(headerLines);
+    response.setHeaderLines(responseHeaderLines);
     response.setBody(responseBodyLine);
 
-    clientSocket.getOutputStream().write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
+    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
+    osStream.flush();
+  }
 
+  public static void handleUserAgent(Socket clientSocket, HttpRequest parsedRequest) throws IOException {
+    var osStream = clientSocket.getOutputStream();
+
+    HttpResponse response = new HttpResponse();
+    StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
+
+    List<ResponseHeaderLine> responseHeaderLines = new ArrayList<>();
+    ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.PLAIN_TEXT.getType());
+    responseHeaderLines.add(responseHeaderLine);
+
+    String userAgent = (String) parsedRequest.getHeaderLines().stream()
+        .filter(responseHeaderLine1 -> responseHeaderLine1.getHeaderName().equals(HttpHeaders.USER_AGENT.getHeader()))
+        .findFirst()
+        .map(responseHeaderLine1 -> responseHeaderLine1.getHeaderValue())
+        .orElse("Unknown");
+    responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), userAgent.length());
+    responseHeaderLines.add(responseHeaderLine);
+
+    ResponseBodyLine responseBodyLine = response.getResponseBodyLine(userAgent);
+
+    response.setStatusLine(statusLine);
+    response.setHeaderLines(responseHeaderLines);
+    response.setBody(responseBodyLine);
+
+    osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
+    osStream.flush();
   }
 }

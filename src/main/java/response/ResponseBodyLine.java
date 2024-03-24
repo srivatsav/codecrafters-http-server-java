@@ -1,10 +1,6 @@
 package response;
 
 import static enums.ServerConstants.CR_LF;
-import static enums.ServerConstants.SPACE;
-
-import enums.HttpStatus;
-import response.StatusLine.StatusLineBuilder;
 
 public class ResponseBodyLine<T> implements HttpResponseLine{
 

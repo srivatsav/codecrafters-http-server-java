@@ -5,7 +5,7 @@ import static enums.ServerConstants.SPACE;
 
 import enums.HttpStatus;
 
-public class StatusLine implements HttpResponseLine{
+public class StatusLine implements HttpResponseLine {
 
   private String httpVersion;
   private HttpStatus httpStatus;

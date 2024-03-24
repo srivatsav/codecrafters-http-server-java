@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import request.HttpRequest;
 
 public class Main {
   public static void main(String[] args) {
@@ -20,10 +21,12 @@ public class Main {
        HttpRequest parsedRequest = handleRequest(clientSocket);
        ResponseHandler responseHandler = new ResponseHandler();
 
-       if(parsedRequest.getEndpoint().equals("/"))
+       if(parsedRequest.getRequestLine().getRequestTarget().equals("/"))
          responseHandler.handleOK(clientSocket);
-       else if(parsedRequest.getEndpoint().startsWith("/echo"))
+       else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/echo"))
          responseHandler.handleEcho(clientSocket, parsedRequest);
+       else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
+         responseHandler.handleUserAgent(clientSocket, parsedRequest);
        else
          responseHandler.handle404(clientSocket);
 

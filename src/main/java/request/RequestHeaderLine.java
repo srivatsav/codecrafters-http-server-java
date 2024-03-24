@@ -1,16 +1,26 @@
-package response;
+package request;
 
 import static enums.ServerConstants.COLON;
 import static enums.ServerConstants.CR_LF;
 import static enums.ServerConstants.SPACE;
 
-public class HeaderLine<T> implements HttpResponseLine{
+import response.HttpResponseLine;
+
+public class RequestHeaderLine<T> implements HttpResponseLine {
   private String headerName;
   private T headerValue;
 
-  private HeaderLine(String headerName, T headerValue) {
+  private RequestHeaderLine(String headerName, T headerValue) {
     this.headerName = headerName;
     this.headerValue = headerValue;
+  }
+
+  public String getHeaderName() {
+    return headerName;
+  }
+
+  public T getHeaderValue() {
+    return headerValue;
   }
 
   @Override
@@ -26,16 +36,16 @@ public class HeaderLine<T> implements HttpResponseLine{
     private String headerName;
     private T headerValue;
 
-    public HeaderLine.HeaderLineBuilder headerName(String headerName) {
-      this.headerName = headerName;
+    public HeaderLineBuilder headerName(String headerName) {
+      this.headerName = headerName.substring(0, headerName.length()-1);
       return this;
     }
-    public HeaderLine.HeaderLineBuilder headerValue(T headerValue) {
+    public HeaderLineBuilder headerValue(T headerValue) {
       this.headerValue = headerValue;
       return this;
     }
-    public HeaderLine build() {
-      return new HeaderLine(headerName, headerValue);
+    public RequestHeaderLine build() {
+      return new RequestHeaderLine(headerName, headerValue);
     }
   }
 }
