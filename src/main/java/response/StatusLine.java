@@ -19,7 +19,6 @@ public class StatusLine implements HttpResponseLine {
     String statusLine = stringBuilder.append(this.httpVersion)
         .append(SPACE).append(this.httpStatus.getStatus())
         .append(CR_LF).append(CR_LF).toString();
-    System.out.println("Status Line --- "+statusLine);
     return statusLine;
   }
 
