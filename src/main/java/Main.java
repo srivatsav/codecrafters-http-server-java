@@ -37,6 +37,8 @@ public class Main {
                responseHandler.handleEcho(finalSocket, parsedRequest);
              else if (parsedRequest.getRequestLine().getRequestTarget().equals("/user-agent"))
                responseHandler.handleUserAgent(finalSocket, parsedRequest);
+             else if(parsedRequest.getRequestLine().getRequestTarget().startsWith("/files"))
+               responseHandler.handleFiles(finalSocket, parsedRequest, args[1]);
              else
                responseHandler.handle404(finalSocket);
 

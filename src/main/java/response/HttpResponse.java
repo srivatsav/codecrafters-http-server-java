@@ -36,7 +36,8 @@ public class HttpResponse {
     }
     // marks the end of headers
     response.append(CR_LF);
-    response.append(body.getResponseLine());
+    if(body != null)
+      response.append(body.getResponseLine());
     System.out.println("Logging response body :: " + response);
     return response.toString();
   }
