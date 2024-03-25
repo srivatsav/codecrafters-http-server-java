@@ -94,17 +94,15 @@ public class ResponseHandler {
         String httpMethod = parsedRequest.getRequestLine().getHttpMethod();
 
         switch (httpMethod) {
-          case "GET": {
-            if (!FileHandler.fileExists(filePath)) { this.handle404(finalSocket); break;}
+          case "GET" -> {
+            if (!FileHandler.fileExists(filePath)) {
+              this.handle404(finalSocket);
+              break;
+            }
             FileIO.serveFile(response, filePath, osStream);
-            break;
           }
-          case "POST":
-            FileIO.createFile(response, filePath, parsedRequest,osStream);
-            break;
-          default:
-            this.handle404(finalSocket);
-            break;
+          case "POST" -> FileIO.createFile(response, filePath, parsedRequest, osStream);
+          default -> this.handle404(finalSocket);
         }
       } catch (IOException e) {
         System.out.println("IOException: " + e.getMessage());
