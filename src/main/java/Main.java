@@ -12,7 +12,6 @@ public class Main {
     System.out.println("Logs from your program will appear here!");
 
     // Uncomment this block to pass the first stage
-    //
      ServerSocket serverSocket = null;
      Socket clientSocket = null;
 
@@ -24,7 +23,6 @@ public class Main {
 
        while(true) {
          clientSocket = serverSocket.accept(); // Wait for connection from client.
-
          Socket finalSocket = clientSocket;
          executorService.submit(() -> {
            try {

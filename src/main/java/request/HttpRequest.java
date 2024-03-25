@@ -53,13 +53,7 @@ public class HttpRequest {
             .map(responseHeaderLine1 -> responseHeaderLine1.getHeaderValue())
             .orElse("Unknown");
 
-          if(contentLength.equals("Unknown")){
-            StringBuilder body = new StringBuilder();
-            while ((line = bufferedReader.readLine()) != null) {
-              body.append(line);
-            }
-            this.requestBodyLine = new RequestBodyLine(body);
-          } else {
+          if(!contentLength.equals("Unknown")){
             int length = Integer.parseInt(contentLength);
             char[] body = new char[length];
             bufferedReader.read(body, 0, length);
