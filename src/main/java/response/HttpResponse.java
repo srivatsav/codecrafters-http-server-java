@@ -3,11 +3,12 @@ package response;
 import static enums.ServerConstants.CR_LF;
 
 import enums.HttpStatus;
+import java.util.Collections;
 import java.util.List;
 
 public class HttpResponse {
   private StatusLine statusLine;
-  private List<ResponseHeaderLine> responseHeaderLines;
+  private List<ResponseHeaderLine> responseHeaderLines = Collections.emptyList();
   private ResponseBodyLine body;
   public HttpResponse(){}
   public StatusLine getStatusLine(String httpVersion, HttpStatus httpStatus ) {

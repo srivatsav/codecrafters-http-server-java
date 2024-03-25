@@ -7,6 +7,7 @@ import enums.HttpStatus;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 
 import java.nio.charset.StandardCharsets;
@@ -85,40 +86,28 @@ public class ResponseHandler {
     String fileName = parsedRequest.getRequestLine().getRequestTarget().substring(7);
     String filePath = directory + fileName;
     System.out.println(filePath);
-    if (!FileHandler.fileExists(filePath)) {
-      this.handle404(finalSocket);
-    } else {
+
       try {
         var osStream = finalSocket.getOutputStream();
         HttpResponse response = new HttpResponse();
-        StatusLine statusLine = response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK);
-        List<ResponseHeaderLine> responseHeaderLines = new ArrayList<>();
-        ResponseHeaderLine responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_TYPE.getHeader(), ContentType.OCTET_STREAM.getType());
-        responseHeaderLines.add(responseHeaderLine);
 
-        File file = FileHandler.getFile(filePath);
-        responseHeaderLine = response.getHeaderLine(HttpHeaders.CONTENT_LENGTH.getHeader(), file.length());
-        responseHeaderLines.add(responseHeaderLine);
+        String httpMethod = parsedRequest.getRequestLine().getHttpMethod();
 
-        response.setStatusLine(statusLine);
-        response.setHeaderLines(responseHeaderLines);
-        osStream.write(response.writeResponse().getBytes(StandardCharsets.UTF_8));
-        osStream.flush();
-
-        try(FileInputStream fis = new FileInputStream(file)){
-          byte[] dataBuffer = new byte[2048];
-          int bytesRead;
-          while((bytesRead = fis.read(dataBuffer)) != -1) {
-            osStream.write(dataBuffer, 0, bytesRead);
+        switch (httpMethod) {
+          case "GET": {
+            if (!FileHandler.fileExists(filePath)) { this.handle404(finalSocket); break;}
+            FileIO.serveFile(response, filePath, osStream);
+            break;
           }
+          case "POST":
+            FileIO.createFile(response, filePath, parsedRequest,osStream);
+            break;
+          default:
+            this.handle404(finalSocket);
+            break;
         }
-        osStream.flush();
       } catch (IOException e) {
         System.out.println("IOException: " + e.getMessage());
       }
     }
-
-
-
   }
-}

@@ -1,5 +1,7 @@
 package request;
 
-public class RequestBodyLine {
-
+public record RequestBodyLine<T>(T body) {
+  public T getBody() {
+    return body;
+  }
 }
