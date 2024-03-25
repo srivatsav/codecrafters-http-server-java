@@ -49,7 +49,7 @@ public class FileIO {
 
   public static void createFile(HttpResponse response, String filePath, HttpRequest parsedRequest,
       OutputStream osStream) throws IOException {
-    response.setStatusLine(response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.OK));
+    response.setStatusLine(response.getStatusLine(HTTP_VERSION_1_1, HttpStatus.CREATED));
 
     File file = FileHandler.createFile(filePath);
     RequestBodyLine requestBodyLine = parsedRequest.getRequestBodyLine();
