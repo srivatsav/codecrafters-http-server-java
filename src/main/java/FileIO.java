@@ -53,15 +53,17 @@ public class FileIO {
 
     File file = FileHandler.createFile(filePath);
     RequestBodyLine requestBodyLine = parsedRequest.getRequestBodyLine();
+    char[]arr = (char[]) requestBodyLine.getBody();
     FileOutputStream fos = new FileOutputStream(file);
+    OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
     try {
-      byte[]data = ObjectSerializer.serialize(requestBodyLine.getBody());
-      fos.write(data);
+      osw.write(arr);
       System.out.println("File created successfully!");
     } catch (IOException e) {
       System.out.println("An error occurred while creating the file.");
       e.printStackTrace();
     } finally {
+      osw.close();
       fos.close();
     }
     osStream.write(response.writeResponse().concat(CR_LF).getBytes(StandardCharsets.UTF_8));
